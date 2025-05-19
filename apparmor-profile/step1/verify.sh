@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Verify that the Pod's write operation is denied
-logs=$(kubectl exec -n apparmor pods/deny-write-pod -- touch /test.txt)
+# Run the command and capture both stdout and stderr
+output=$(kubectl exec -n apparmor pods/deny-write-pod -- touch /test.txt 2>&1)
 
-if [[ "$logs" == *"permission denied"* ]]; then
+# Check for 'Permission denied' in the output
+if [[ "$output" == *"Permission denied"* ]]; then
+  echo "Write operation correctly denied"
   exit 0
 else
+  echo "Unexpected result:"
+  echo "$output"
   exit 1
 fi
